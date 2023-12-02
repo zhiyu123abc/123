@@ -1,0 +1,111 @@
+---
+title: "ECO6126 Assignment 4"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+author: XIE ZHIYU and 223020328
+output:
+  pdf_document: 
+    toc: yes
+    toc_depth: 3
+    latex_engine: xelatex
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(comment = NA, fig.align='center', fig.height=6, fig.width=6)#This chunk would not show up in your final pdf
+```
+
+```{r}
+library(ISLR)
+```
+
+\textbf{I hereby declare that, except for the code provided by the course instructors, all of my code, report, and figures were produced by myself.}
+
+\newpage
+
+## Question 1
+
+### (a)
+
+```{r}
+set.seed(123)
+data(OJ)
+train_index <- sample(1:nrow(OJ), 800)
+train_set <- OJ[train_index, ]
+test_set <- OJ[-train_index, ]
+
+```
+
+### (b)
+
+```{r}
+library(tree)
+oj_tree <- tree(Purchase ~ ., data = train_set)
+summary(oj_tree)
+train_pred <- predict(oj_tree, train_set, type = "class")
+train_error_rate <- mean(train_pred != train_set$Purchase)
+
+```
+
+### (c)
+
+```{r}
+plot(oj_tree)
+text(oj_tree, pretty = 0)
+```
+
+### (d)
+
+```{r}
+test_pred <- predict(oj_tree, test_set, type = "class")
+confusion_matrix <- table(test_set$Purchase, test_pred)
+test_error_rate <- mean(test_pred != test_set$Purchase)
+
+```
+
+### (e)
+
+```{r}
+cv_oj_tree <- cv.tree(oj_tree, FUN = prune.misclass)
+```
+
+### (f)
+
+```{r}
+plot(cv_oj_tree$size, cv_oj_tree$dev, type="b")
+```
+
+### (g)
+
+```{r}
+optimal_size <- cv_oj_tree$size[which.min(cv_oj_tree$dev)]
+```
+
+### (h)
+
+```{r}
+pruned_tree <- prune.misclass(oj_tree, best = optimal_size)
+```
+
+
+### (i)
+
+```{r}
+pruned_train_pred <- predict(pruned_tree, train_set, type = "class")
+pruned_train_error_rate <- mean(pruned_train_pred != train_set$Purchase)
+unpruned_train_error_rate <- train_error_rate 
+
+```
+
+
+### (j)
+
+```{r}
+pruned_test_pred <- predict(pruned_tree, test_set, type = "class")
+pruned_test_error_rate <- mean(pruned_test_pred != test_set$Purchase)
+unpruned_test_error_rate <- test_error_rate 
+
+```
+
+
+$$
+-END-
+$$
